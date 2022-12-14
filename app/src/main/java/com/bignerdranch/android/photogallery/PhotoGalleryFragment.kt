@@ -3,6 +3,7 @@ package com.bignerdranch.android.photogallery
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -32,8 +33,10 @@ private const val TAG = "PhotoGalleryFragment"
         photoGalleryViewModel = ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
         val responseHandler = Handler()
         thumbnailDownloader = ThumbnailDownloader(responseHandler){
-                photoHolder,bitmap -> val drawable=BitmapDrawable(resources,bitmap)
-            photoHolder.bindDrawable(drawable)
+                photoHolder,bitmap ->
+            val drawable=BitmapDrawable(resources,bitmap)
+
+            photoHolder.imageView.setImageDrawable(drawable)
         }
 
         lifecycle.addObserver(thumbnailDownloader.fragmentLifecycleObserver)
@@ -62,7 +65,7 @@ private const val TAG = "PhotoGalleryFragment"
         ) { galleryItems ->
             Log.d(TAG, "Have gallery items from view model $galleryItems")
             photoRecyclerView.adapter = PhotoAdapter(galleryItems)
-            photoRecyclerView.adapter = PhotoText(galleryItems) //добавил в цикл текст
+           // photoRecyclerView.adapter = PhotoText(galleryItems) //добавил в цикл текст
 
         }
     }
@@ -114,37 +117,47 @@ private const val TAG = "PhotoGalleryFragment"
      }
 
      // вывод Адаптер картинок
-    private class PhotoHolder(private val itemImageView:ImageView,):RecyclerView.ViewHolder(itemImageView){
-    val bindDrawable:(Drawable) -> Unit = itemImageView::setImageDrawable
+    private class PhotoHolder(photoItemView: View)
+         :RecyclerView.ViewHolder(photoItemView){
+             val imageView: ImageView
+             val titleView: TextView
+
+             init{
+                 imageView = photoItemView.findViewById(R.id.photo_image)
+                 titleView = photoItemView.findViewById(R.id.photo_text)
+             }
+
+
+    //val bindDrawable:(Drawable) -> Unit = itemImageView::setImageDrawable
     }
 
 
 
 
      // Адаптер текста
-     private class PhotoHold(itemTextView: TextView) : RecyclerView.ViewHolder(itemTextView)
-     {
-         val bindTitle: (CharSequence) -> Unit = itemTextView::setText
-     }
-
-
-     private class PhotoText(private val galleryItems: List<GalleryItem>)
-         : RecyclerView.Adapter<PhotoHold>() {
-         override fun onCreateViewHolder(
-             parent: ViewGroup,
-             viewType: Int
-         ): PhotoHold {
-             val textView =
-                 TextView(parent.context)
-             return PhotoHold(textView)
-         }
-         override fun getItemCount(): Int = galleryItems.size
-         override fun onBindViewHolder(holde: PhotoHold, position: Int) {
-             val galleryItem =
-                 galleryItems[position]
-             holde.bindTitle(galleryItem.title)
-         }
-     }
+//     private class PhotoHold(itemTextView: TextView) : RecyclerView.ViewHolder(itemTextView)
+//     {
+//         val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+//     }
+//
+//
+//     private class PhotoText(private val galleryItems: List<GalleryItem>)
+//         : RecyclerView.Adapter<PhotoHold>() {
+//         override fun onCreateViewHolder(
+//             parent: ViewGroup,
+//             viewType: Int
+//         ): PhotoHold {
+//             val textView =
+//                 TextView(parent.context)
+//             return PhotoHold(textView)
+//         }
+//         override fun getItemCount(): Int = galleryItems.size
+//         override fun onBindViewHolder(holde: PhotoHold, position: Int) {
+//             val galleryItem =
+//                 galleryItems[position]
+//             holde.bindTitle(galleryItem.title)
+//         }
+//     }
 
 
 
@@ -163,7 +176,7 @@ private const val TAG = "PhotoGalleryFragment"
                 R.layout.list_item_gallery,
                 parent,
                 false
-            ) as ImageView
+            )as ImageView
             return PhotoHolder(view)
         }
 
@@ -175,12 +188,16 @@ private const val TAG = "PhotoGalleryFragment"
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
-            val placeholder: Drawable =
-                ContextCompat.getDrawable(
+
+            val placeholder: Drawable = ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.jdun // изменение самой иконки при загрузке
-                ) ?: ColorDrawable()
-            holder.bindDrawable(placeholder)
+                    R.drawable.jdun ) ?: ColorDrawable() // изменение самой иконки при загрузке
+
+            holder.imageView.setImageDrawable(placeholder)
+            holder.titleView.setText(galleryItem.title)
+
+
+            //holder.bindDrawable(placeholder)
             thumbnailDownloader.queueThumbnail(holder,galleryItem.url)
         }
     }
