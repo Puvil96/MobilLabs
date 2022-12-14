@@ -134,32 +134,6 @@ private const val TAG = "PhotoGalleryFragment"
 
 
 
-     // Адаптер текста
-//     private class PhotoHold(itemTextView: TextView) : RecyclerView.ViewHolder(itemTextView)
-//     {
-//         val bindTitle: (CharSequence) -> Unit = itemTextView::setText
-//     }
-//
-//
-//     private class PhotoText(private val galleryItems: List<GalleryItem>)
-//         : RecyclerView.Adapter<PhotoHold>() {
-//         override fun onCreateViewHolder(
-//             parent: ViewGroup,
-//             viewType: Int
-//         ): PhotoHold {
-//             val textView =
-//                 TextView(parent.context)
-//             return PhotoHold(textView)
-//         }
-//         override fun getItemCount(): Int = galleryItems.size
-//         override fun onBindViewHolder(holde: PhotoHold, position: Int) {
-//             val galleryItem =
-//                 galleryItems[position]
-//             holde.bindTitle(galleryItem.title)
-//         }
-//     }
-
-
 
 //Вывод адаптер картинок
 
